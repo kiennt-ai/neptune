@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Tính Điểm Neptune 2026 - VMU (Cập nhật Bộ Lọc)</title>
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SheetJS (Thư viện xuất Excel chuẩn) -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vmu: { blue: '#0c4a6e', navy: '#075985', gold: '#f59e0b', light: '#f0f9ff' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-sky-950 via-sky-900 to-cyan-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 text-amber-400 text-2xl shadow-inner">
+          <i class="fa-solid fa-anchor"></i>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            GIẢI THƯỞNG KH&CN NEPTUNE 2026
+            <span class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full border border-amber-400/30">VMU Excel Mode</span>
+          </h1>
+          <p class="text-xs text-sky-200">Hệ thống tính điểm quy đổi & Xuất báo cáo theo Biểu mẫu chuẩn</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="loadSampleData()" class="px-3 py-1.5 bg-sky-800 hover:bg-sky-700 text-white rounded-lg text-xs font-medium border border-sky-600/50 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-cloud-arrow-down text-amber-400"></i> Nạp dữ liệu mẫu
+        </button>
+        <button onclick="exportExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition shadow">
+          <i class="fa-solid fa-file-excel"></i> Xuất File Báo Cáo
+        </button>
+        <button onclick="clearAllData()" class="px-3 py-1.5 bg-rose-800/80 hover:bg-rose-700 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-trash-can"></i> Xóa hết
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-white border-b border-slate-200 shadow-sm sticky top-[68px] z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-1 sm:space-x-4" aria-label="Tabs">
+        <button onclick="switchTab('tab-tapthe')" id="nav-tapthe" class="tab-btn active border-b-2 border-sky-800 text-sky-900 font-semibold px-4 py-3 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-users-rectangle"></i> Hạng Mục Tập Thể
+        </button>
+        <button onclick="switchTab('tab-canhan')" id="nav-canhan" class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-700 px-4 py-3 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-user-graduate"></i> Hạng Mục Cá Nhân
+        </button>
+        <button onclick="switchTab('tab-dashboard')" id="nav-dashboard" class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-700 px-4 py-3 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-table-list text-sky-600"></i> Bảng Tổng Hợp
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ================== TAB 1: TẬP THỂ ================== -->
+    <section id="tab-tapthe" class="tab-content block space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between border-b pb-3 mb-4">
+          <h2 class="text-base font-bold text-sky-950 flex items-center gap-2">
+            <i class="fa-solid fa-building-columns text-sky-700"></i> Kê khai Công Trình / Hoạt Động (Tập thể)
+          </h2>
+        </div>
+
+        <form id="form-tapthe" onsubmit="addWorkTapThe(event)" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Tập thể / Đơn vị *</label>
+            <input type="text" id="tt-donvi" required placeholder="Ví dụ: Khoa Hàng hải, Phòng KHCN..." class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:ring-2 focus:ring-sky-600 focus:outline-none">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Công trình/ Tạp chí/ Giải thưởng *</label>
+            <input type="text" id="tt-ten" required placeholder="Ví dụ: Nghiên cứu thuật toán điều khiển..." class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:ring-2 focus:ring-sky-600 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Phân loại theo quy định *</label>
+            <select id="tt-loai" required onchange="handleTapTheTypeChange()" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none bg-slate-50">
+              <optgroup label="1. Đề tài NCKH">
+                <option value="DT_NN">Công trình NCKH Cấp Nhà nước (3.50đ)</option>
+                <option value="DT_BO">Công trình NCKH Cấp Bộ (2.00đ)</option>
+                <option value="DT_TP">Công trình NCKH Cấp Thành phố (1.50đ)</option>
+                <option value="DT_TRUONG_TD">Công trình NCKH Cấp Trường trọng điểm (1.50đ)</option>
+                <option value="DT_TRUONG">Công trình NCKH Cấp Trường (0.50đ)</option>
+              </optgroup>
+              <optgroup label="2. Sinh viên NCKH">
+                <option value="SV_NCKH">Hướng dẫn NCKH Sinh viên (0.25đ + thưởng)</option>
+              </optgroup>
+              <optgroup label="3. Tạp chí Quốc tế">
+                <option value="BB_ISI_Q1">Tạp chí thuộc danh mục ISI - Q1 (3.50đ)</option>
+                <option value="BB_ISI_Q2">Tạp chí thuộc danh mục ISI - Q2 (3.25đ)</option>
+                <option value="BB_ISI_Q3">Tạp chí thuộc danh mục ISI - Q3 (3.00đ)</option>
+                <option value="BB_ISI_Q4">Tạp chí thuộc danh mục ISI - Q4 (2.75đ)</option>
+                <option value="BB_SCOPUS">Tạp chí thuộc danh mục Scopus (2.00đ)</option>
+              </optgroup>
+              <optgroup label="4. Tạp chí trong nước & Kỷ yếu">
+                <option value="BB_HDGS">Tạp chí KHCN Hàng hải & TC HĐGS (0.75đ)</option>
+                <option value="HOITHAO_ISI">Kỷ yếu hội thảo QT ISI/Scopus (1.75đ)</option>
+                <option value="HOITHAO_QG_QT">Kỷ yếu hội thảo Quốc gia, Quốc tế (0.50đ)</option>
+              </optgroup>
+              <optgroup label="5. Sách & Giáo trình">
+                <option value="SACH_CK">Sách chuyên khảo (3.00đ)</option>
+                <option value="GIAO_TRINH">Giáo trình (2.00đ)</option>
+                <option value="TLTK">Tài liệu tham khảo (0.50đ)</option>
+              </optgroup>
+              <optgroup label="6. SHTT & Khác">
+                <option value="SHTT">Văn bằng đăng ký Sở hữu trí tuệ (2.00đ)</option>
+                <option value="TOCHUC_HOITHAO">Tổ chức Hội nghị, Hội thảo tại đơn vị (0.25đ)</option>
+                <option value="NOISAN">Nội san khoa học của đơn vị (0.15đ)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div id="tt-box-tacgia" class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Số tác giả (Tổng)</label>
+              <input type="number" id="tt-tong-tacgia" min="1" value="1" oninput="previewPointTapThe()" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tác giả thuộc Đơn vị</label>
+              <input type="number" id="tt-tacgia-donvi" min="1" value="1" oninput="previewPointTapThe()" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+            </div>
+          </div>
+
+          <div id="tt-box-giai-sv" class="hidden grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Giải cấp Trường</label>
+              <select id="tt-giai-truong" onchange="previewPointTapThe()" class="w-full text-xs rounded-lg border-slate-300 border p-2">
+                <option value="0">Không có giải</option>
+                <option value="0.25">Giải Nhất (+0.25)</option>
+                <option value="0.20">Giải Nhì (+0.20)</option>
+                <option value="0.15">Giải Ba (+0.15)</option>
+                <option value="0.10">Giải Khuyến khích (+0.10)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Giải cấp Bộ</label>
+              <select id="tt-giai-bo" onchange="previewPointTapThe()" class="w-full text-xs rounded-lg border-slate-300 border p-2">
+                <option value="0">Không có giải</option>
+                <option value="0.25">Giải Nhất (+0.25)</option>
+                <option value="0.20">Giải Nhì (+0.20)</option>
+                <option value="0.15">Giải Ba (+0.15)</option>
+                <option value="0.10">Giải Khuyến khích (+0.10)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Lưu ý minh chứng (DOI / Trang / Số)</label>
+            <input type="text" id="tt-minhchung" placeholder="VD: DOI: 10.1016/..." class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+          </div>
+
+          <div class="flex items-end gap-3 md:col-span-2 lg:col-span-2">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 flex-1">
+              <span class="text-[11px] text-amber-800 block">Điểm quy đổi dự kiến:</span>
+              <span id="tt-preview-score" class="text-base font-bold text-amber-600">3.50</span>
+            </div>
+            <button type="submit" class="h-10 px-5 bg-sky-900 hover:bg-sky-800 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-plus-circle"></i> Thêm công trình
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Bảng Tập thể -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b flex flex-wrap items-center justify-between gap-3 bg-slate-50/50">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-slate-800">Dữ liệu Công Trình Tập Thể</span>
+            <span id="tt-badge-count" class="bg-sky-100 text-sky-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">0</span>
+          </div>
+          <!-- Đã cập nhật: Lọc theo Loại Hình -->
+          <div class="flex items-center gap-2 text-xs">
+            <label>Lọc loại hình:</label>
+            <select id="tt-filter-loai" onchange="renderTapTheTable()" class="rounded-md border-slate-300 border p-1.5 text-xs max-w-[250px] truncate bg-white shadow-sm">
+              <option value="ALL">-- Tất cả loại hình --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b text-[11px]">
+              <tr>
+                <th class="p-2.5 text-center w-10">TT</th>
+                <th class="p-2.5">Đơn vị / Tập thể</th>
+                <th class="p-2.5">Tên công trình/ Hoạt động</th>
+                <th class="p-2.5">Loại hình</th>
+                <th class="p-2.5 text-center">Tác giả (ĐV/Tổng)</th>
+                <th class="p-2.5 text-right">Điểm quy đổi</th>
+                <th class="p-2.5 text-center w-12">Xóa</th>
+              </tr>
+            </thead>
+            <tbody id="tt-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="text-center py-6 text-slate-400 italic">Chưa có dữ liệu.</td></tr>
+            </tbody>
+            <tfoot class="bg-sky-50 font-semibold border-t">
+              <tr>
+                <td colspan="5" class="p-2.5 text-right">Tổng cộng:</td>
+                <td id="tt-total-score" class="p-2.5 text-right text-sm text-sky-900">0.00</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================== TAB 2: CÁ NHÂN ================== -->
+    <section id="tab-canhan" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between border-b pb-3 mb-4">
+          <h2 class="text-base font-bold text-sky-950 flex items-center gap-2">
+            <i class="fa-solid fa-user-pen text-sky-700"></i> Kê khai Công Trình / Hoạt Động (Cá nhân)
+          </h2>
+        </div>
+
+        <form id="form-canhan" onsubmit="addWorkCaNhan(event)" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Họ và tên cá nhân *</label>
+            <input type="text" id="cn-hoten" required placeholder="VD: Nguyễn Văn A" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Đơn vị công tác *</label>
+            <input type="text" id="cn-donvi" required placeholder="VD: Khoa Hàng hải..." class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tên Công trình/ Tạp chí/ Giải thưởng *</label>
+            <input type="text" id="cn-ten" required placeholder="VD: Tối ưu hóa hệ thống đẩy tàu thủy..." class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Phân loại theo quy định *</label>
+            <select id="cn-loai" required onchange="handleCaNhanTypeChange()" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none bg-slate-50">
+              <optgroup label="1. Đề tài NCKH">
+                <option value="DT_NN">Công trình NCKH Cấp Nhà nước (3.50đ)</option>
+                <option value="DT_BO">Công trình NCKH Cấp Bộ (2.00đ)</option>
+                <option value="DT_TP">Công trình NCKH Cấp Thành phố (1.50đ)</option>
+                <option value="DT_TRUONG_TD">Công trình NCKH Cấp Trường trọng điểm (1.50đ)</option>
+                <option value="DT_TRUONG">Công trình NCKH Cấp Trường (0.50đ)</option>
+              </optgroup>
+              <optgroup label="2. Sinh viên NCKH">
+                <option value="SV_NCKH">Hướng dẫn NCKH Sinh viên (0.25đ + thưởng)</option>
+              </optgroup>
+              <optgroup label="3. Tạp chí Quốc tế">
+                <option value="BB_ISI_Q1">Tạp chí thuộc danh mục ISI - Q1 (3.50đ)</option>
+                <option value="BB_ISI_Q2">Tạp chí thuộc danh mục ISI - Q2 (3.25đ)</option>
+                <option value="BB_ISI_Q3">Tạp chí thuộc danh mục ISI - Q3 (3.00đ)</option>
+                <option value="BB_ISI_Q4">Tạp chí thuộc danh mục ISI - Q4 (2.75đ)</option>
+                <option value="BB_SCOPUS">Tạp chí thuộc danh mục Scopus (2.00đ)</option>
+              </optgroup>
+              <optgroup label="4. Tạp chí trong nước & Kỷ yếu">
+                <option value="BB_HDGS">Tạp chí KHCN Hàng hải & TC HĐGS (0.75đ)</option>
+                <option value="HOITHAO_ISI">Kỷ yếu hội thảo QT ISI/Scopus (1.75đ)</option>
+                <option value="HOITHAO_QG_QT">Kỷ yếu hội thảo Quốc gia, Quốc tế (0.50đ)</option>
+              </optgroup>
+              <optgroup label="5. Sách & Giáo trình">
+                <option value="SACH_CK">Sách chuyên khảo (3.00đ)</option>
+                <option value="GIAO_TRINH">Giáo trình (2.00đ)</option>
+                <option value="TLTK">Tài liệu tham khảo (0.50đ)</option>
+              </optgroup>
+              <optgroup label="6. SHTT">
+                <option value="SHTT">Các văn bằng đăng ký Sở hữu trí tuệ (2.00đ)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Vai trò của Cá nhân *</label>
+            <select id="cn-vaitro" required onchange="previewPointCaNhan()" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none bg-slate-50">
+              <!-- JS render -->
+            </select>
+          </div>
+
+          <div id="cn-box-tong-nguoi">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tổng số tác giả / thành viên</label>
+            <input type="number" id="cn-tong-thanhvien" min="1" value="1" oninput="previewPointCaNhan()" class="w-full text-xs rounded-lg border-slate-300 border p-2 focus:outline-none">
+          </div>
+
+          <div id="cn-box-giai-sv" class="hidden grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Giải cấp Trường</label>
+              <select id="cn-giai-truong" onchange="previewPointCaNhan()" class="w-full text-xs rounded-lg border-slate-300 border p-2">
+                <option value="0">Không có giải</option>
+                <option value="0.25">Giải Nhất (+0.25)</option>
+                <option value="0.20">Giải Nhì (+0.20)</option>
+                <option value="0.15">Giải Ba (+0.15)</option>
+                <option value="0.10">Giải Khuyến khích (+0.10)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Giải cấp Bộ</label>
+              <select id="cn-giai-bo" onchange="previewPointCaNhan()" class="w-full text-xs rounded-lg border-slate-300 border p-2">
+                <option value="0">Không có giải</option>
+                <option value="0.25">Giải Nhất (+0.25)</option>
+                <option value="0.20">Giải Nhì (+0.20)</option>
+                <option value="0.15">Giải Ba (+0.15)</option>
+                <option value="0.10">Giải Khuyến khích (+0.10)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-end gap-3 md:col-span-2 lg:col-span-2">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 flex-1">
+              <span class="text-[11px] text-amber-800 block">Điểm cá nhân:</span>
+              <span id="cn-preview-score" class="text-base font-bold text-amber-600">3.50</span>
+            </div>
+            <button type="submit" class="h-10 px-5 bg-sky-900 hover:bg-sky-800 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-user-plus"></i> Thêm công trình
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Bảng Cá nhân -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b flex flex-wrap items-center justify-between gap-3 bg-slate-50/50">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-slate-800">Dữ liệu Công Trình Cá Nhân</span>
+            <span id="cn-badge-count" class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">0</span>
+          </div>
+          <!-- Đã cập nhật: Lọc theo Loại Hình -->
+          <div class="flex items-center gap-2 text-xs">
+            <label>Lọc loại hình:</label>
+            <select id="cn-filter-loai" onchange="renderCaNhanTable()" class="rounded-md border-slate-300 border p-1.5 text-xs max-w-[250px] truncate bg-white shadow-sm">
+              <option value="ALL">-- Tất cả loại hình --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b text-[11px]">
+              <tr>
+                <th class="p-2.5 text-center w-10">TT</th>
+                <th class="p-2.5">Họ và Tên</th>
+                <th class="p-2.5">Tên công trình</th>
+                <th class="p-2.5">Loại hình</th>
+                <th class="p-2.5">Vai trò</th>
+                <th class="p-2.5 text-right">Điểm quy đổi</th>
+                <th class="p-2.5 text-center w-12">Xóa</th>
+              </tr>
+            </thead>
+            <tbody id="cn-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="text-center py-6 text-slate-400 italic">Chưa có dữ liệu.</td></tr>
+            </tbody>
+            <tfoot class="bg-amber-50 font-semibold border-t">
+              <tr>
+                <td colspan="5" class="p-2.5 text-right">Tổng cộng:</td>
+                <td id="cn-total-score" class="p-2.5 text-right text-sm text-amber-900">0.00</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================== TAB 3: BẢNG TỔNG HỢP ================== -->
+    <section id="tab-dashboard" class="tab-content hidden space-y-6">
+      
+      <div class="bg-gradient-to-r from-sky-800 to-sky-900 rounded-xl p-5 text-white shadow">
+        <h3 class="text-lg font-bold">Báo Cáo Tóm Tắt Dữ Liệu</h3>
+        <p class="text-xs text-sky-200 mt-1">Dữ liệu trên sẽ được xuất ra file Excel tại 2 sheet: TH TAP THE và TH CA NHAN.</p>
+      </div>
+
+      <!-- TỔNG HỢP TẬP THỂ -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b bg-slate-50 flex items-center gap-2">
+          <i class="fa-solid fa-users-rectangle text-sky-700 text-lg"></i>
+          <h4 class="font-bold text-slate-800">Bảng Tổng Hợp Tập Thể (Dự kiến xuất Excel)</h4>
+        </div>
+        <div class="overflow-x-auto max-h-96">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead class="bg-slate-100 text-slate-700 font-semibold sticky top-0">
+              <tr>
+                <th class="p-2 border">Đơn vị</th>
+                <th class="p-2 border">Tên Công trình</th>
+                <th class="p-2 border">Loại Tạp chí/Công trình</th>
+                <th class="p-2 border text-center">Tác giả ĐV / Tổng</th>
+                <th class="p-2 border text-right">Điểm quy đổi</th>
+              </tr>
+            </thead>
+            <tbody id="summary-tapthe-body" class="divide-y divide-slate-100">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TỔNG HỢP CÁ NHÂN -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b bg-slate-50 flex items-center gap-2">
+          <i class="fa-solid fa-user-graduate text-amber-600 text-lg"></i>
+          <h4 class="font-bold text-slate-800">Bảng Tổng Hợp Cá Nhân (Dự kiến xuất Excel)</h4>
+        </div>
+        <div class="overflow-x-auto max-h-96">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead class="bg-slate-100 text-slate-700 font-semibold sticky top-0">
+              <tr>
+                <th class="p-2 border">Họ và Tên</th>
+                <th class="p-2 border">Tên Công trình</th>
+                <th class="p-2 border">Loại Tạp chí/Công trình</th>
+                <th class="p-2 border">Vai trò</th>
+                <th class="p-2 border text-center">Tổng TG</th>
+                <th class="p-2 border text-right">Điểm quy đổi</th>
+              </tr>
+            </thead>
+            <tbody id="summary-canhan-body" class="divide-y divide-slate-100">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const SCORE_RULES = {
+      'DT_NN': { base: 3.50, name: 'Công trình NCKH Cấp Nhà nước' },
+      'DT_BO': { base: 2.00, name: 'Công trình NCKH Cấp Bộ' },
+      'DT_TP': { base: 1.50, name: 'Công trình NCKH Cấp Thành phố' },
+      'DT_TRUONG_TD': { base: 1.50, name: 'Công trình NCKH Cấp Trường trọng điểm' },
+      'DT_TRUONG': { base: 0.50, name: 'Công trình NCKH Cấp Trường' },
+      'SV_NCKH': { base: 0.25, name: 'Hướng dẫn NCKH Sinh viên' },
+      'BB_ISI_Q1': { base: 3.50, name: 'Tạp chí thuộc danh mục ISI - Q1' },
+      'BB_ISI_Q2': { base: 3.25, name: 'Tạp chí thuộc danh mục ISI - Q2' },
+      'BB_ISI_Q3': { base: 3.00, name: 'Tạp chí thuộc danh mục ISI - Q3' },
+      'BB_ISI_Q4': { base: 2.75, name: 'Tạp chí thuộc danh mục ISI - Q4' },
+      'BB_SCOPUS': { base: 2.00, name: 'Tạp chí thuộc danh mục Scopus' },
+      'BB_HDGS': { base: 0.75, name: 'Tạp chí KHCN Hàng hải & TC HĐGS' },
+      'HOITHAO_ISI': { base: 1.75, name: 'Kỷ yếu hội thảo QT ISI/Scopus' },
+      'HOITHAO_QG_QT': { base: 0.50, name: 'Kỷ yếu hội thảo Quốc gia, Quốc tế' },
+      'SACH_CK': { base: 3.00, name: 'Sách chuyên khảo' },
+      'GIAO_TRINH': { base: 2.00, name: 'Giáo trình' },
+      'TLTK': { base: 0.50, name: 'Tài liệu tham khảo' },
+      'SHTT': { base: 2.00, name: 'Văn bằng đăng ký Sở hữu trí tuệ' },
+      'TOCHUC_HOITHAO': { base: 0.25, name: 'Tổ chức Hội nghị, Hội thảo tại đơn vị' },
+      'NOISAN': { base: 0.15, name: 'Nội san khoa học của đơn vị' }
+    };
+
+    let tapTheData = JSON.parse(localStorage.getItem('neptune_tapthe_2026') || '[]');
+    let caNhanData = JSON.parse(localStorage.getItem('neptune_canhan_2026') || '[]');
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-sky-800', 'text-sky-900', 'font-semibold');
+        btn.classList.add('border-transparent', 'text-slate-500');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeNav = document.getElementById('nav-' + tabId.replace('tab-', ''));
+      activeNav.classList.add('border-sky-800', 'text-sky-900', 'font-semibold');
+      activeNav.classList.remove('border-transparent', 'text-slate-500');
+
+      if (tabId === 'tab-dashboard') renderDashboard();
+    }
+
+    // ================== LOGIC TẬP THỂ ==================
+    function handleTapTheTypeChange() {
+      const type = document.getElementById('tt-loai').value;
+      const isArticleOrConf = ['BB_ISI_Q1','BB_ISI_Q2','BB_ISI_Q3','BB_ISI_Q4','BB_SCOPUS','BB_HDGS','HOITHAO_ISI','HOITHAO_QG_QT'].includes(type);
+      document.getElementById('tt-box-tacgia').style.display = isArticleOrConf ? 'grid' : 'none';
+      document.getElementById('tt-box-giai-sv').style.display = (type === 'SV_NCKH') ? 'grid' : 'none';
+      previewPointTapThe();
+    }
+
+    function calculateScoreTapThe(type, totalAuthors, unitAuthors, giaiTruong, giaiBo) {
+      const rule = SCORE_RULES[type];
+      if (!rule) return 0;
+      let base = rule.base;
+      if (['BB_ISI_Q1','BB_ISI_Q2','BB_ISI_Q3','BB_ISI_Q4','BB_SCOPUS','BB_HDGS','HOITHAO_ISI','HOITHAO_QG_QT'].includes(type)) {
+        totalAuthors = Math.max(1, parseInt(totalAuthors) || 1);
+        unitAuthors = Math.max(1, parseInt(unitAuthors) || 1);
+        if (unitAuthors > totalAuthors) unitAuthors = totalAuthors;
+        return (base / totalAuthors) * unitAuthors;
+      }
+      if (type === 'SV_NCKH') return base + parseFloat(giaiTruong || 0) + parseFloat(giaiBo || 0);
+      return base;
+    }
+
+    function previewPointTapThe() {
+      const type = document.getElementById('tt-loai').value;
+      const total = document.getElementById('tt-tong-tacgia').value;
+      const unit = document.getElementById('tt-tacgia-donvi').value;
+      const gTruong = document.getElementById('tt-giai-truong').value;
+      const gBo = document.getElementById('tt-giai-bo').value;
+      document.getElementById('tt-preview-score').innerText = calculateScoreTapThe(type, total, unit, gTruong, gBo).toFixed(2);
+    }
+
+    function addWorkTapThe(e) {
+      e.preventDefault();
+      const donvi = document.getElementById('tt-donvi').value.trim();
+      const ten = document.getElementById('tt-ten').value.trim();
+      const loai = document.getElementById('tt-loai').value;
+      const totalAuthors = parseInt(document.getElementById('tt-tong-tacgia').value) || 1;
+      const unitAuthors = parseInt(document.getElementById('tt-tacgia-donvi').value) || 1;
+      const score = calculateScoreTapThe(loai, totalAuthors, unitAuthors, document.getElementById('tt-giai-truong').value, document.getElementById('tt-giai-bo').value);
+
+      tapTheData.push({
+        id: 'TT_' + Date.now(), donvi, ten, loai, loaiTen: SCORE_RULES[loai].name,
+        totalAuthors, unitAuthors, minhchung: document.getElementById('tt-minhchung').value, 
+        score: parseFloat(score.toFixed(2))
+      });
+      saveData(); renderTapTheTable(); updateFilterOptions();
+      document.getElementById('tt-ten').value = '';
+    }
+
+    function deleteWorkTapThe(id) {
+      if (confirm('Xóa công trình này?')) {
+        tapTheData = tapTheData.filter(item => item.id !== id);
+        saveData(); renderTapTheTable(); updateFilterOptions();
+      }
+    }
+
+    function renderTapTheTable() {
+      const tbody = document.getElementById('tt-table-body');
+      // Lấy giá trị lọc theo loại hình
+      const filter = document.getElementById('tt-filter-loai').value;
+      tbody.innerHTML = '';
+      
+      const filtered = filter === 'ALL' ? tapTheData : tapTheData.filter(d => d.loai === filter);
+      document.getElementById('tt-badge-count').innerText = filtered.length;
+
+      let sum = 0;
+      filtered.forEach((item, index) => {
+        sum += item.score;
+        const authorStr = ['BB_ISI_Q1','BB_ISI_Q2','BB_ISI_Q3','BB_ISI_Q4','BB_SCOPUS','BB_HDGS','HOITHAO_ISI','HOITHAO_QG_QT'].includes(item.loai) ? `${item.unitAuthors}/${item.totalAuthors}` : '-';
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-2.5 text-center text-slate-500">${index + 1}</td>
+            <td class="p-2.5 font-semibold text-sky-950">${item.donvi}</td>
+            <td class="p-2.5 text-slate-800">${item.ten}</td>
+            <td class="p-2.5"><span class="bg-slate-100 px-2 py-0.5 rounded text-[11px]">${item.loaiTen}</span></td>
+            <td class="p-2.5 text-center font-medium">${authorStr}</td>
+            <td class="p-2.5 text-right font-bold text-sky-900">${item.score.toFixed(2)}</td>
+            <td class="p-2.5 text-center"><button onclick="deleteWorkTapThe('${item.id}')" class="text-rose-500"><i class="fa-solid fa-trash-can"></i></button></td>
+          </tr>
+        `;
+      });
+      document.getElementById('tt-total-score').innerText = sum.toFixed(2);
+    }
+
+    // ================== LOGIC CÁ NHÂN ==================
+    function handleCaNhanTypeChange() {
+      const type = document.getElementById('cn-loai').value;
+      const vaitro = document.getElementById('cn-vaitro');
+      const boxGiaiSv = document.getElementById('cn-box-giai-sv');
+      const boxNguoi = document.getElementById('cn-box-tong-nguoi');
+
+      vaitro.innerHTML = '';
+      boxGiaiSv.style.display = (type === 'SV_NCKH') ? 'grid' : 'none';
+
+      if (type.startsWith('DT_')) {
+        boxNguoi.style.display = 'block';
+        vaitro.innerHTML = `<option value="CN_DOC_LAP">Chủ nhiệm công trình (100%)</option><option value="CN_NHOM">Chủ nhiệm đề tài nhóm (50%)</option><option value="THANH_VIEN">Thành viên tham gia</option>`;
+      } else if (['BB_ISI_Q1','BB_ISI_Q2','BB_ISI_Q3','BB_ISI_Q4','BB_SCOPUS'].includes(type)) {
+        boxNguoi.style.display = 'block';
+        vaitro.innerHTML = `<option value="TG_THUNHAT_VA_LIENHE">Tác giả Thứ nhất & Tác giả Liên hệ (60%+)</option><option value="TG_THU_NHAT">Tác giả thứ nhất</option><option value="TG_LIEN_HE">Tác giả liên hệ</option><option value="DONG_TAC_GIA">Đồng tác giả tham gia</option>`;
+      } else if (['BB_HDGS','HOITHAO_ISI','HOITHAO_QG_QT'].includes(type)) {
+        boxNguoi.style.display = 'block';
+        vaitro.innerHTML = `<option value="TG_THU_NHAT_TN">Tác giả đứng thứ nhất</option><option value="DONG_TAC_GIA_TN">Thành viên tham gia còn lại</option>`;
+      } else if (['SACH_CK','GIAO_TRINH','TLTK'].includes(type)) {
+        boxNguoi.style.display = 'block';
+        vaitro.innerHTML = `<option value="CHỦ_BIEN_1">Chủ biên (độc lập)</option><option value="CHỦ_BIEN_NHOM">Chủ biên nhóm</option><option value="TV_BIEN_SOAN">Thành viên tham gia biên soạn</option><option value="HIEU_DINH">Hiệu đính</option>`;
+      } else if (type === 'SHTT') {
+        boxNguoi.style.display = 'block';
+        vaitro.innerHTML = `<option value="SHTT_1">Cá nhân đứng tên</option><option value="SHTT_TAP_THE">Tập thể đứng tên</option>`;
+      } else if (type === 'SV_NCKH') {
+        boxNguoi.style.display = 'none';
+        vaitro.innerHTML = `<option value="HD_SV">Hướng dẫn chính</option>`;
+      }
+      previewPointCaNhan();
+    }
+
+    function calculateScoreCaNhan(type, vaitro, totalMembers, giaiTruong, giaiBo) {
+      const base = SCORE_RULES[type]?.base || 0;
+      const N = Math.max(1, parseInt(totalMembers) || 1);
+
+      if (vaitro === 'CN_DOC_LAP') return base;
+      if (vaitro === 'CN_NHOM') return base * 0.5;
+      if (vaitro === 'THANH_VIEN') return base / N;
+      if (vaitro === 'HD_SV') return base + parseFloat(giaiTruong || 0) + parseFloat(giaiBo || 0);
+      if (vaitro === 'TG_THUNHAT_VA_LIENHE') return (0.60 * base) + ((0.40 * base) / N); 
+      if (vaitro === 'TG_THU_NHAT' || vaitro === 'TG_LIEN_HE') return (0.30 * base) + ((0.40 * base) / N);
+      if (vaitro === 'DONG_TAC_GIA') return (0.40 * base) / N;
+      if (vaitro === 'TG_THU_NHAT_TN') return (0.60 * base) + ((0.40 * base) / N);
+      if (vaitro === 'DONG_TAC_GIA_TN') return (0.40 * base) / N;
+      if (vaitro === 'CHỦ_BIEN_1') return base;
+      if (vaitro === 'CHỦ_BIEN_NHOM') return (0.60 * base / 1) + ((0.40 * base) / N);
+      if (vaitro === 'TV_BIEN_SOAN') return (0.40 * base) / N;
+      if (vaitro === 'HIEU_DINH') return 0.30 * base;
+      if (vaitro === 'SHTT_1') return base;
+      if (vaitro === 'SHTT_TAP_THE') return base / N;
+      return base;
+    }
+
+    function previewPointCaNhan() {
+      const type = document.getElementById('cn-loai').value;
+      const vt = document.getElementById('cn-vaitro').value;
+      const total = document.getElementById('cn-tong-thanhvien').value;
+      const gt = document.getElementById('cn-giai-truong').value;
+      const gb = document.getElementById('cn-giai-bo').value;
+      document.getElementById('cn-preview-score').innerText = calculateScoreCaNhan(type, vt, total, gt, gb).toFixed(2);
+    }
+
+    function addWorkCaNhan(e) {
+      e.preventDefault();
+      const hoten = document.getElementById('cn-hoten').value.trim();
+      const donvi = document.getElementById('cn-donvi').value.trim();
+      const ten = document.getElementById('cn-ten').value.trim();
+      const loai = document.getElementById('cn-loai').value;
+      const vaitro = document.getElementById('cn-vaitro').value;
+      const vaitroTen = document.getElementById('cn-vaitro').options[document.getElementById('cn-vaitro').selectedIndex].text;
+      const totalMembers = parseInt(document.getElementById('cn-tong-thanhvien').value) || 1;
+      const score = calculateScoreCaNhan(loai, vaitro, totalMembers, document.getElementById('cn-giai-truong').value, document.getElementById('cn-giai-bo').value);
+
+      caNhanData.push({
+        id: 'CN_' + Date.now(), hoten, donvi, ten, loai, loaiTen: SCORE_RULES[loai].name,
+        vaitro, vaitroTen, totalMembers, score: parseFloat(score.toFixed(2))
+      });
+      saveData(); renderCaNhanTable(); updateFilterOptions();
+      document.getElementById('cn-ten').value = '';
+    }
+
+    function deleteWorkCaNhan(id) {
+      if (confirm('Xóa công trình này?')) {
+        caNhanData = caNhanData.filter(i => i.id !== id);
+        saveData(); renderCaNhanTable(); updateFilterOptions();
+      }
+    }
+
+    function renderCaNhanTable() {
+      const tbody = document.getElementById('cn-table-body');
+      // Lấy giá trị lọc theo loại hình
+      const filter = document.getElementById('cn-filter-loai').value;
+      tbody.innerHTML = '';
+      
+      const filtered = filter === 'ALL' ? caNhanData : caNhanData.filter(d => d.loai === filter);
+      document.getElementById('cn-badge-count').innerText = filtered.length;
+
+      let sum = 0;
+      filtered.forEach((item, index) => {
+        sum += item.score;
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-2.5 text-center text-slate-500">${index + 1}</td>
+            <td class="p-2.5 font-bold text-sky-950">${item.hoten}</td>
+            <td class="p-2.5 text-slate-800">${item.ten}</td>
+            <td class="p-2.5"><span class="bg-slate-100 px-2 py-0.5 rounded text-[11px]">${item.loaiTen}</span></td>
+            <td class="p-2.5 text-slate-600 max-w-[200px] truncate" title="${item.vaitroTen}">${item.vaitroTen}</td>
+            <td class="p-2.5 text-right font-bold text-amber-700">${item.score.toFixed(2)}</td>
+            <td class="p-2.5 text-center"><button onclick="deleteWorkCaNhan('${item.id}')" class="text-rose-500"><i class="fa-solid fa-trash-can"></i></button></td>
+          </tr>
+        `;
+      });
+      document.getElementById('cn-total-score').innerText = sum.toFixed(2);
+    }
+
+    // ================== DASHBOARD TỔNG HỢP & XUẤT EXCEL ==================
+    function renderDashboard() {
+      const bTT = document.getElementById('summary-tapthe-body');
+      bTT.innerHTML = '';
+      tapTheData.forEach((d, i) => {
+        const authorStr = ['BB_ISI_Q1','BB_ISI_Q2','BB_ISI_Q3','BB_ISI_Q4','BB_SCOPUS','BB_HDGS','HOITHAO_ISI','HOITHAO_QG_QT'].includes(d.loai) ? `${d.unitAuthors}/${d.totalAuthors}` : '-';
+        bTT.innerHTML += `<tr><td class="p-2 border">${d.donvi}</td><td class="p-2 border">${d.ten}</td><td class="p-2 border">${d.loaiTen}</td><td class="p-2 border text-center">${authorStr}</td><td class="p-2 border text-right font-bold text-sky-800">${d.score.toFixed(2)}</td></tr>`;
+      });
+
+      const bCN = document.getElementById('summary-canhan-body');
+      bCN.innerHTML = '';
+      caNhanData.forEach((d, i) => {
+        bCN.innerHTML += `<tr><td class="p-2 border">${d.hoten}</td><td class="p-2 border">${d.ten}</td><td class="p-2 border">${d.loaiTen}</td><td class="p-2 border">${d.vaitroTen}</td><td class="p-2 border text-center">${d.totalMembers}</td><td class="p-2 border text-right font-bold text-amber-800">${d.score.toFixed(2)}</td></tr>`;
+      });
+    }
+
+    function exportExcel() {
+      if (tapTheData.length === 0 && caNhanData.length === 0) {
+        alert("Chưa có dữ liệu để xuất Excel.");
+        return;
+      }
+      
+      const wb = XLSX.utils.book_new();
+
+      const wsTapTheData = tapTheData.map((item, index) => {
+        return {
+          "TT": index + 1,
+          "Đơn vị": item.donvi,
+          "Tên Công trình/ Tạp chí/ Giải thưởng": item.ten,
+          "Loại Tạp chí/Công trình": item.loaiTen,
+          "Số tác giả": item.totalAuthors || 1,
+          "Tác giả thuộc đơn vị": item.unitAuthors || 1,
+          "Điểm công trình quy đổi": item.score,
+          "Lưu ý minh chứng": item.minhchung || ""
+        };
+      });
+
+      const wsCaNhanData = caNhanData.map((item, index) => {
+        return {
+          "TT": index + 1,
+          "Họ và Tên": item.hoten,
+          "Tên Công trình/ Tạp chí/ Giải thưởng": item.ten,
+          "Loại Tạp chí/Công trình": item.loaiTen,
+          "Số tác giả": item.totalMembers || 1,
+          "Vai trò Tác giả": item.vaitroTen,
+          "Điểm công trình quy đổi": item.score
+        };
+      });
+
+      const wsTapThe = XLSX.utils.json_to_sheet(wsTapTheData);
+      const wsCaNhan = XLSX.utils.json_to_sheet(wsCaNhanData);
+      XLSX.utils.book_append_sheet(wb, wsTapThe, "TH TAP THE");
+      XLSX.utils.book_append_sheet(wb, wsCaNhan, "TH CA NHAN");
+
+      wsTapThe['!cols'] = [{wch:5}, {wch:25}, {wch:45}, {wch:35}, {wch:12}, {wch:20}, {wch:22}, {wch:25}];
+      wsCaNhan['!cols'] = [{wch:5}, {wch:25}, {wch:45}, {wch:35}, {wch:12}, {wch:45}, {wch:22}];
+
+      XLSX.writeFile(wb, `TH_NEPTUNE_2026_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    function updateFilterOptions() {
+      // Cập nhật Filter Tập thể theo loại hình (dựa trên loai đang có trong data)
+      const filterTT = document.getElementById('tt-filter-loai');
+      const valTT = filterTT.value;
+      const loaisTT = [...new Set(tapTheData.map(i => i.loai))];
+      filterTT.innerHTML = '<option value="ALL">-- Tất cả loại hình --</option>' + 
+        loaisTT.map(l => `<option value="${l}">${SCORE_RULES[l]?.name || l}</option>`).join('');
+      filterTT.value = loaisTT.includes(valTT) ? valTT : 'ALL';
+
+      // Cập nhật Filter Cá nhân theo loại hình (dựa trên loai đang có trong data)
+      const filterCN = document.getElementById('cn-filter-loai');
+      const valCN = filterCN.value;
+      const loaisCN = [...new Set(caNhanData.map(i => i.loai))];
+      filterCN.innerHTML = '<option value="ALL">-- Tất cả loại hình --</option>' + 
+        loaisCN.map(l => `<option value="${l}">${SCORE_RULES[l]?.name || l}</option>`).join('');
+      filterCN.value = loaisCN.includes(valCN) ? valCN : 'ALL';
+    }
+
+    function saveData() {
+      localStorage.setItem('neptune_tapthe_2026', JSON.stringify(tapTheData));
+      localStorage.setItem('neptune_canhan_2026', JSON.stringify(caNhanData));
+    }
+
+    function clearAllData() {
+      if (confirm('Xóa toàn bộ dữ liệu?')) {
+        tapTheData = []; caNhanData = [];
+        saveData(); renderTapTheTable(); renderCaNhanTable(); updateFilterOptions();
+        if(!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      }
+    }
+
+    function loadSampleData() {
+      tapTheData = [
+        { id: 'TT_01', donvi: 'Khoa Hàng hải', ten: 'Đề tài NCKH Cấp Trường 2025-2026', loai: 'DT_TRUONG', loaiTen: 'Công trình NCKH Cấp Trường', totalAuthors: 1, unitAuthors: 1, score: 0.50, minhchung: 'QĐ 852' },
+        { id: 'TT_02', donvi: 'Khoa Máy tàu biển', ten: 'Journal of Sea Research', loai: 'BB_ISI_Q2', loaiTen: 'Tạp chí thuộc danh mục ISI - Q2', totalAuthors: 3, unitAuthors: 2, score: 2.17, minhchung: 'DOI: 10.1016' }
+      ];
+      caNhanData = [
+        { id: 'CN_01', hoten: 'NGUYỄN VĂN A', donvi: 'Khoa Hàng hải', ten: 'Acta logistica', loai: 'BB_SCOPUS', loaiTen: 'Tạp chí thuộc danh mục Scopus', vaitro: 'TG_THUNHAT_VA_LIENHE', vaitroTen: 'Tác giả Thứ nhất & Tác giả Liên hệ (60%+)', totalMembers: 3, score: 1.47 },
+        { id: 'CN_02', hoten: 'NGUYỄN VĂN A', donvi: 'Khoa Hàng hải', ten: 'Đề tài NCKH cấp Trường', loai: 'DT_TRUONG', loaiTen: 'Công trình NCKH Cấp Trường', vaitro: 'CN_DOC_LAP', vaitroTen: 'Chủ nhiệm công trình (100%)', totalMembers: 1, score: 0.50 }
+      ];
+      saveData(); renderTapTheTable(); renderCaNhanTable(); updateFilterOptions();
+      if(!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      alert('Đã nạp dữ liệu mẫu!');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      handleTapTheTypeChange();
+      handleCaNhanTypeChange();
+      renderTapTheTable();
+      renderCaNhanTable();
+      updateFilterOptions();
+    });
+  </script>
+</body>
+</html>
