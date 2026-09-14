@@ -341,7 +341,7 @@
             <label class="block text-xs font-semibold text-amber-900 mb-1 flex items-center gap-1">
               <i class="fa-solid fa-users text-amber-600"></i> Số lượng Chủ biên / Đồng CB *
             </label>
-            <input type="number" id="cn-so-chubien" min="2" value="2" oninput="previewPointCaNhan()" class="w-full text-xs rounded-lg border-amber-300 border p-2 bg-amber-50/50 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <input type="number" id="cn-so-chubien" min="1" value="2" oninput="previewPointCaNhan()" class="w-full text-xs rounded-lg border-amber-300 border p-2 bg-amber-50/50 focus:outline-none focus:ring-2 focus:ring-amber-500">
             <span class="text-[10px] text-amber-700 block mt-0.5">Phần vai trò chủ biên sẽ chia đều cho số Chủ biên</span>
           </div>
 
@@ -809,4 +809,622 @@
       let N = Math.max(1, parseInt(totalMembers) || 1);
       let M = Math.max(1, parseInt(soChuBien) || 1);
 
-      if (v
+      if (vaitro === 'CN_DOC_LAP') return { score: base, note: `Chủ nhiệm độc lập: 100% = ${base.toFixed(2)}đ` };
+      if (vaitro === 'CN_NHOM') return { score: base * 0.5, note: `Chủ nhiệm đề tài nhóm: 50% = ${(base * 0.5).toFixed(2)}đ` };
+      if (vaitro === 'THANH_VIEN') return { score: base / N, note: `Chia đều ${N} thành viên = ${(base / N).toFixed(2)}đ` };
+      if (vaitro === 'HD_SV') {
+        const s = base + parseFloat(giaiTruong || 0) + parseFloat(giaiBo || 0);
+        return { score: s, note: `Cơ sở ${base.toFixed(2)}đ + thưởng giải` };
+      }
+      if (vaitro === 'TG_THUNHAT_VA_LIENHE') {
+        const s = (0.60 * base) + ((0.40 * base) / N);
+        return { score: s, note: `(60% × ${base.toFixed(2)}) + (40% × ${base.toFixed(2)} / ${N} TG) = ${s.toFixed(2)}đ` };
+      }
+      if (vaitro === 'TG_THU_NHAT' || vaitro === 'TG_LIEN_HE') {
+        const s = (0.30 * base) + ((0.40 * base) / N);
+        return { score: s, note: `(30% × ${base.toFixed(2)}) + (40% × ${base.toFixed(2)} / ${N} TG) = ${s.toFixed(2)}đ` };
+      }
+      if (vaitro === 'DONG_TAC_GIA') {
+        const s = (0.40 * base) / N;
+        return { score: s, note: `(40% × ${base.toFixed(2)}) / ${N} TG = ${s.toFixed(2)}đ` };
+      }
+      if (vaitro === 'TG_THU_NHAT_TN') {
+        const s = (0.60 * base) + ((0.40 * base) / N);
+        return { score: s, note: `(60% × ${base.toFixed(2)}) + (40% × ${base.toFixed(2)} / ${N} TG) = ${s.toFixed(2)}đ` };
+      }
+      if (vaitro === 'DONG_TAC_GIA_TN') {
+        const s = (0.40 * base) / N;
+        return { score: s, note: `(40% × ${base.toFixed(2)}) / ${N} TG = ${s.toFixed(2)}đ` };
+      }
+
+      // ================== MỤC 5: SÁCH & GIÁO TRÌNH ==================
+      if (vaitro === 'CHỦ_BIEN_1') {
+        return { score: base, note: `Chủ biên độc lập hưởng trọn 100% = ${base.toFixed(2)}đ` };
+      }
+      if (vaitro === 'CHỦ_BIEN_NHOM') {
+        // 1 Chủ biên duy nhất trong nhóm: phần chủ biên (60%) + phần phân bổ tác giả (40% / N)
+        const s = (0.60 * base / 1) + ((0.40 * base) / N);
+        return { score: s, note: `(60% × ${base.toFixed(2)} / 1 CB) + (40% × ${base.toFixed(2)} / ${N} TG) = ${s.toFixed(2)}đ` };
+      }
+      if (vaitro === 'DONG_CHU_BIEN') {
+        // Có Đồng chủ biên: phần của 1 chủ biên = (Điểm cá nhân của vai trò chủ biên 60% / số Chủ biên M) + (phần phân bổ biên soạn 40% / N)
+        M = Math.max(2, M);
+        if (N < M) N = M;
+        const cbPart = (0.60 * base) / M;
+        const bsPart = (0.40 * base) / N;
+        const s = cbPart + bsPart;
+        return { 
+          score: s, 
+          note: `Vai trò CB: (60% × ${base.toFixed(2)} / ${M} CB = ${cbPart.toFixed(2)}đ) + Biên soạn: (40% × ${base.toFixed(2)} / ${N} TG = ${bsPart.toFixed(2)}đ)` 
+        };
+      }
+      if (vaitro === 'TV_BIEN_SOAN') {
+        const s = (0.40 * base) / N;
+        return { score: s, note: `(40% × ${base.toFixed(2)}) / ${N} TG = ${s.toFixed(2)}đ` };
+      }
+      if (vaitro === 'HIEU_DINH') {
+        const s = 0.30 * base;
+        return { score: s, note: `Hiệu đính: 30% × ${base.toFixed(2)} = ${s.toFixed(2)}đ` };
+      }
+
+      if (vaitro === 'SHTT_1') return { score: base, note: `Cá nhân 100% = ${base.toFixed(2)}đ` };
+      if (vaitro === 'SHTT_TAP_THE') return { score: base / N, note: `Tập thể chia đều ${N} người = ${(base / N).toFixed(2)}đ` };
+      return { score: base, note: '' };
+    }
+
+    function previewPointCaNhan() {
+      const type = document.getElementById('cn-loai').value;
+      const vt = document.getElementById('cn-vaitro').value;
+      const total = document.getElementById('cn-tong-thanhvien').value;
+      const gt = document.getElementById('cn-giai-truong').value;
+      const gb = document.getElementById('cn-giai-bo').value;
+      const soChuBien = document.getElementById('cn-so-chubien').value;
+
+      const res = calculateScoreCaNhan(type, vt, total, gt, gb, soChuBien);
+      document.getElementById('cn-preview-score').innerText = res.score.toFixed(2);
+      const noteEl = document.getElementById('cn-formula-note');
+      noteEl.innerText = res.note;
+      noteEl.title = res.note;
+    }
+
+    function handleCaNhanSubmit(e) {
+      e.preventDefault();
+      const hoten = document.getElementById('cn-hoten').value.trim();
+      const donvi = document.getElementById('cn-donvi').value.trim();
+      const ten = document.getElementById('cn-ten').value.trim();
+      const loai = document.getElementById('cn-loai').value;
+      const vaitro = document.getElementById('cn-vaitro').value;
+      let vaitroTen = document.getElementById('cn-vaitro').options[document.getElementById('cn-vaitro').selectedIndex].text;
+      const soChuBien = parseInt(document.getElementById('cn-so-chubien').value) || 1;
+      let totalMembers = parseInt(document.getElementById('cn-tong-thanhvien').value) || 1;
+      
+      if (['SACH_CK','GIAO_TRINH','TLTK'].includes(loai) && vaitro === 'DONG_CHU_BIEN') {
+        if (totalMembers < soChuBien) {
+          totalMembers = soChuBien;
+          document.getElementById('cn-tong-thanhvien').value = totalMembers;
+        }
+        vaitroTen = `Đồng chủ biên (${soChuBien} chủ biên / ${totalMembers} tác giả)`;
+      }
+
+      const gTruong = document.getElementById('cn-giai-truong').value;
+      const gBo = document.getElementById('cn-giai-bo').value;
+      const res = calculateScoreCaNhan(loai, vaitro, totalMembers, gTruong, gBo, soChuBien);
+
+      if (editingCaNhanId) {
+        // Cập nhật công trình cá nhân
+        const index = caNhanData.findIndex(item => item.id === editingCaNhanId);
+        if (index !== -1) {
+          caNhanData[index] = {
+            ...caNhanData[index],
+            hoten, donvi, ten, loai, loaiTen: SCORE_RULES[loai].name,
+            vaitro, vaitroTen, totalMembers, soChuBien,
+            giaiTruong: gTruong, giaiBo: gBo,
+            score: parseFloat(res.score.toFixed(2))
+          };
+        }
+        cancelEditCaNhan();
+      } else {
+        // Thêm mới
+        caNhanData.push({
+          id: 'CN_' + Date.now(), hoten, donvi, ten, loai, loaiTen: SCORE_RULES[loai].name,
+          vaitro, vaitroTen, totalMembers, soChuBien,
+          giaiTruong: gTruong, giaiBo: gBo,
+          score: parseFloat(res.score.toFixed(2))
+        });
+        document.getElementById('cn-ten').value = '';
+      }
+
+      saveData();
+      renderCaNhanTable();
+      updateFilterOptions();
+      if (!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+    }
+
+    function editWorkCaNhan(id) {
+      const item = caNhanData.find(i => i.id === id);
+      if (!item) return;
+
+      editingCaNhanId = id;
+      document.getElementById('cn-hoten').value = item.hoten || '';
+      document.getElementById('cn-donvi').value = item.donvi || '';
+      document.getElementById('cn-ten').value = item.ten || '';
+      document.getElementById('cn-loai').value = item.loai || 'DT_NN';
+      handleCaNhanTypeChange();
+
+      document.getElementById('cn-vaitro').value = item.vaitro || '';
+      if (item.soChuBien) {
+        document.getElementById('cn-so-chubien').value = item.soChuBien;
+      }
+      handleCaNhanVaiTroChange();
+
+      document.getElementById('cn-tong-thanhvien').value = item.totalMembers || 1;
+      if (item.giaiTruong !== undefined) document.getElementById('cn-giai-truong').value = item.giaiTruong;
+      if (item.giaiBo !== undefined) document.getElementById('cn-giai-bo').value = item.giaiBo;
+
+      previewPointCaNhan();
+
+      // Cập nhật giao diện sang chế độ sửa
+      document.getElementById('cn-edit-banner').classList.remove('hidden');
+      document.getElementById('cn-edit-name').innerText = item.ten;
+      document.getElementById('cn-form-mode-badge').innerText = 'Chế độ: Đang hiệu chỉnh';
+      document.getElementById('cn-form-mode-badge').className = 'text-xs font-semibold px-2.5 py-1 rounded bg-amber-100 text-amber-800';
+
+      const submitBtn = document.getElementById('cn-btn-submit');
+      submitBtn.className = 'h-10 px-5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1.5 whitespace-nowrap';
+      submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>Lưu cập nhật</span>';
+
+      document.getElementById('cn-btn-cancel').classList.remove('hidden');
+      document.getElementById('form-canhan').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelEditCaNhan() {
+      editingCaNhanId = null;
+      document.getElementById('cn-edit-banner').classList.add('hidden');
+      document.getElementById('cn-edit-name').innerText = '';
+      document.getElementById('cn-form-mode-badge').innerText = 'Chế độ: Thêm mới';
+      document.getElementById('cn-form-mode-badge').className = 'text-xs font-semibold px-2.5 py-1 rounded bg-amber-100 text-amber-800';
+
+      const submitBtn = document.getElementById('cn-btn-submit');
+      submitBtn.className = 'h-10 px-5 bg-sky-900 hover:bg-sky-800 text-white rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1.5 whitespace-nowrap';
+      submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> <span>Thêm công trình</span>';
+
+      document.getElementById('cn-btn-cancel').classList.add('hidden');
+      document.getElementById('cn-ten').value = '';
+      previewPointCaNhan();
+    }
+
+    function deleteWorkCaNhan(id) {
+      if (confirm('Xóa công trình này khỏi danh sách cá nhân?')) {
+        if (editingCaNhanId === id) cancelEditCaNhan();
+        caNhanData = caNhanData.filter(i => i.id !== id);
+        saveData(); renderCaNhanTable(); updateFilterOptions();
+        if (!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      }
+    }
+
+    function renderCaNhanTable() {
+      const tbody = document.getElementById('cn-table-body');
+      const filter = document.getElementById('cn-filter-loai').value;
+      tbody.innerHTML = '';
+      
+      const filtered = filter === 'ALL' ? caNhanData : caNhanData.filter(d => d.loai === filter);
+      document.getElementById('cn-badge-count').innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">Chưa có dữ liệu.</td></tr>';
+        document.getElementById('cn-total-score').innerText = '0.00';
+        return;
+      }
+
+      let sum = 0;
+      filtered.forEach((item, index) => {
+        sum += item.score;
+        const isEditing = (item.id === editingCaNhanId);
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition ${isEditing ? 'bg-amber-50/80 font-medium' : ''}">
+            <td class="p-2.5 text-center text-slate-500">${index + 1}</td>
+            <td class="p-2.5 font-bold text-sky-950">${item.hoten}</td>
+            <td class="p-2.5 text-slate-600">${item.donvi || '-'}</td>
+            <td class="p-2.5 text-slate-800">${item.ten}</td>
+            <td class="p-2.5"><span class="bg-slate-100 px-2 py-0.5 rounded text-[11px]">${item.loaiTen}</span></td>
+            <td class="p-2.5 text-slate-600 max-w-[200px] truncate" title="${item.vaitroTen}">${item.vaitroTen}</td>
+            <td class="p-2.5 text-center font-medium">${item.totalMembers || 1}</td>
+            <td class="p-2.5 text-right font-bold text-amber-700">${item.score.toFixed(2)}</td>
+            <td class="p-2.5 text-center whitespace-nowrap">
+              <button onclick="editWorkCaNhan('${item.id}')" class="text-sky-600 hover:text-sky-800 px-1.5 py-1 rounded transition mr-1" title="Hiệu chỉnh">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button onclick="deleteWorkCaNhan('${item.id}')" class="text-rose-500 hover:text-rose-700 px-1.5 py-1 rounded transition" title="Xóa">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      document.getElementById('cn-total-score').innerText = sum.toFixed(2);
+    }
+
+    // ================== DASHBOARD TỔNG HỢP & XUẤT/NHẬP EXCEL ==================
+    function renderDashboard() {
+      const bTT = document.getElementById('summary-tapthe-body');
+      bTT.innerHTML = '';
+      let sumTT = 0;
+      if (tapTheData.length === 0) {
+        bTT.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Chưa có dữ liệu tập thể.</td></tr>';
+      } else {
+        tapTheData.forEach((d, i) => {
+          sumTT += d.score;
+          const authorStr = ['BB_ISI_Q1','BB_ISI_Q2','BB_ISI_Q3','BB_ISI_Q4','BB_SCOPUS','BB_HDGS','HOITHAO_ISI','HOITHAO_QG_QT'].includes(d.loai) ? `${d.unitAuthors}/${d.totalAuthors}` : '-';
+          bTT.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-2 border text-center text-slate-500">${i + 1}</td>
+              <td class="p-2 border font-medium text-sky-950">${d.donvi}</td>
+              <td class="p-2 border text-slate-800">${d.ten}</td>
+              <td class="p-2 border">${d.loaiTen}</td>
+              <td class="p-2 border text-center">${authorStr}</td>
+              <td class="p-2 border text-right font-bold text-sky-800">${d.score.toFixed(2)}</td>
+              <td class="p-2 border text-slate-500 text-[11px]">${d.minhchung || '-'}</td>
+            </tr>`;
+        });
+      }
+      document.getElementById('summary-tt-total').innerText = `Tổng điểm: ${sumTT.toFixed(2)}`;
+
+      const bCN = document.getElementById('summary-canhan-body');
+      bCN.innerHTML = '';
+      let sumCN = 0;
+      if (caNhanData.length === 0) {
+        bCN.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400 italic">Chưa có dữ liệu cá nhân.</td></tr>';
+      } else {
+        caNhanData.forEach((d, i) => {
+          sumCN += d.score;
+          bCN.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-2 border text-center text-slate-500">${i + 1}</td>
+              <td class="p-2 border font-bold text-sky-950">${d.hoten}</td>
+              <td class="p-2 border text-slate-600">${d.donvi || '-'}</td>
+              <td class="p-2 border text-slate-800">${d.ten}</td>
+              <td class="p-2 border">${d.loaiTen}</td>
+              <td class="p-2 border">${d.vaitroTen}</td>
+              <td class="p-2 border text-center">${d.totalMembers || 1}</td>
+              <td class="p-2 border text-right font-bold text-amber-800">${d.score.toFixed(2)}</td>
+            </tr>`;
+        });
+      }
+      document.getElementById('summary-cn-total').innerText = `Tổng điểm: ${sumCN.toFixed(2)}`;
+    }
+
+    function exportExcel() {
+      if (tapTheData.length === 0 && caNhanData.length === 0) {
+        alert("Chưa có dữ liệu để xuất Excel.");
+        return;
+      }
+      
+      const wb = XLSX.utils.book_new();
+
+      const wsTapTheData = tapTheData.map((item, index) => {
+        return {
+          "TT": index + 1,
+          "Đơn vị": item.donvi,
+          "Tên Công trình/ Tạp chí/ Giải thưởng": item.ten,
+          "Mã loại": item.loai,
+          "Loại Tạp chí/Công trình": item.loaiTen,
+          "Số tác giả": item.totalAuthors || 1,
+          "Tác giả thuộc đơn vị": item.unitAuthors || 1,
+          "Điểm công trình quy đổi": item.score,
+          "Lưu ý minh chứng": item.minhchung || ""
+        };
+      });
+
+      const wsCaNhanData = caNhanData.map((item, index) => {
+        return {
+          "TT": index + 1,
+          "Họ và Tên": item.hoten,
+          "Đơn vị": item.donvi || "",
+          "Tên Công trình/ Tạp chí/ Giải thưởng": item.ten,
+          "Mã loại": item.loai,
+          "Loại Tạp chí/Công trình": item.loaiTen,
+          "Mã vai trò": item.vaitro || "",
+          "Vai trò Tác giả": item.vaitroTen,
+          "Số Chủ biên": item.soChuBien || 1,
+          "Số tác giả": item.totalMembers || 1,
+          "Điểm công trình quy đổi": item.score
+        };
+      });
+
+      const wsTapThe = XLSX.utils.json_to_sheet(wsTapTheData);
+      const wsCaNhan = XLSX.utils.json_to_sheet(wsCaNhanData);
+      XLSX.utils.book_append_sheet(wb, wsTapThe, "TH TAP THE");
+      XLSX.utils.book_append_sheet(wb, wsCaNhan, "TH CA NHAN");
+
+      wsTapThe['!cols'] = [{wch:5}, {wch:25}, {wch:45}, {wch:15}, {wch:35}, {wch:12}, {wch:20}, {wch:22}, {wch:25}];
+      wsCaNhan['!cols'] = [{wch:5}, {wch:25}, {wch:20}, {wch:45}, {wch:15}, {wch:35}, {wch:15}, {wch:45}, {wch:12}, {wch:12}, {wch:22}];
+
+      XLSX.writeFile(wb, `TH_NEPTUNE_2026_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
+    function exportJsonBackup() {
+      const backupData = {
+        version: 'Neptune_2026_v2',
+        exportDate: new Date().toISOString(),
+        tapTheData: tapTheData,
+        caNhanData: caNhanData
+      };
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `NEPTUNE_BACKUP_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ================== TÍNH NĂNG IMPORT DỮ LIỆU ==================
+    function triggerImport() {
+      document.getElementById('import-file-input').click();
+    }
+
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name.toLowerCase();
+      const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+      const isJson = fileName.endsWith('.json');
+
+      if (!isExcel && !isJson) {
+        alert("Vui lòng chọn file Excel (.xlsx, .xls) hoặc file sao lưu JSON (.json)!");
+        event.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+
+      if (isJson) {
+        reader.onload = function(e) {
+          try {
+            const data = JSON.parse(e.target.result);
+            processImportedJson(data);
+          } catch (err) {
+            alert("Lỗi đọc file JSON: Định dạng file không hợp lệ! " + err.message);
+          }
+        };
+        reader.readAsText(file);
+      } else if (isExcel) {
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            processImportedExcel(workbook);
+          } catch (err) {
+            alert("Lỗi đọc file Excel: " + err.message);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+      // Reset input
+      event.target.value = '';
+    }
+
+    function confirmImportMode(newTTCount, newCNCount) {
+      return confirm(
+        `Tìm thấy ${newTTCount} mục Tập thể và ${newCNCount} mục Cá nhân từ file.\\n\\n` +
+        `- Nhấn OK: GỘP THÊM (Append) vào danh sách hiện tại.\\n` +
+        `- Nhấn Cancel: GHI ĐÈ TOÀN BỘ (Thay thế sạch danh sách cũ).`
+      );
+    }
+
+    function processImportedJson(data) {
+      let importedTT = [];
+      let importedCN = [];
+
+      if (Array.isArray(data)) {
+        importedTT = data.filter(i => i.id && i.id.startsWith('TT_'));
+        importedCN = data.filter(i => i.id && i.id.startsWith('CN_'));
+      } else if (data.tapTheData || data.caNhanData) {
+        importedTT = data.tapTheData || [];
+        importedCN = data.caNhanData || [];
+      } else {
+        alert("File JSON không đúng cấu trúc dữ liệu của Neptune!");
+        return;
+      }
+
+      if (importedTT.length === 0 && importedCN.length === 0) {
+        alert("Không tìm thấy dữ liệu hợp lệ trong file JSON.");
+        return;
+      }
+
+      const isAppend = confirmImportMode(importedTT.length, importedCN.length);
+
+      if (isAppend) {
+        importedTT.forEach(i => { if (!i.id || tapTheData.some(x => x.id === i.id)) i.id = 'TT_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4); });
+        importedCN.forEach(i => { if (!i.id || caNhanData.some(x => x.id === i.id)) i.id = 'CN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4); });
+        tapTheData = tapTheData.concat(importedTT);
+        caNhanData = caNhanData.concat(importedCN);
+      } else {
+        tapTheData = importedTT;
+        caNhanData = importedCN;
+      }
+
+      saveData();
+      renderTapTheTable();
+      renderCaNhanTable();
+      updateFilterOptions();
+      if (!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      alert(`Đã nạp thành công ${importedTT.length} mục Tập thể và ${importedCN.length} mục Cá nhân từ file JSON!`);
+    }
+
+    function findLoaiCode(loaiTen, loaiMa) {
+      if (loaiMa && SCORE_RULES[loaiMa]) return loaiMa;
+      if (!loaiTen) return 'DT_NN';
+      const clean = loaiTen.toLowerCase().trim();
+      for (const [code, info] of Object.entries(SCORE_RULES)) {
+        if (info.name.toLowerCase().trim() === clean || clean.includes(info.name.toLowerCase().trim())) {
+          return code;
+        }
+      }
+      return 'DT_NN';
+    }
+
+    function processImportedExcel(workbook) {
+      let importedTT = [];
+      let importedCN = [];
+
+      // Đọc sheet TH TAP THE
+      const ttSheetName = workbook.SheetNames.find(n => n.toUpperCase().includes('TAP THE') || n.toUpperCase().includes('TT'));
+      if (ttSheetName) {
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[ttSheetName]);
+        rows.forEach((row, idx) => {
+          const donvi = row["Đơn vị"] || row["Đơn vị / Tập thể"] || row["Don vi"] || "";
+          const ten = row["Tên Công trình/ Tạp chí/ Giải thưởng"] || row["Tên công trình"] || row["Ten cong trinh"] || "";
+          if (!ten && !donvi) return;
+
+          const loaiTen = row["Loại Tạp chí/Công trình"] || row["Loại hình"] || "";
+          const loaiMa = row["Mã loại"] || "";
+          const loai = findLoaiCode(loaiTen, loaiMa);
+
+          const totalAuthors = parseInt(row["Số tác giả"] || row["Tong so tac gia"] || 1) || 1;
+          const unitAuthors = parseInt(row["Tác giả thuộc đơn vị"] || row["Tac gia don vi"] || 1) || 1;
+          const score = parseFloat(row["Điểm công trình quy đổi"] || row["Điểm"] || 0) || calculateScoreTapThe(loai, totalAuthors, unitAuthors, 0, 0);
+          const minhchung = row["Lưu ý minh chứng"] || row["Minh chứng"] || "";
+
+          importedTT.push({
+            id: 'TT_IMP_' + Date.now() + '_' + idx,
+            donvi, ten, loai, loaiTen: SCORE_RULES[loai]?.name || loaiTen,
+            totalAuthors, unitAuthors, minhchung,
+            score: parseFloat(score.toFixed(2))
+          });
+        });
+      }
+
+      // Đọc sheet TH CA NHAN
+      const cnSheetName = workbook.SheetNames.find(n => n.toUpperCase().includes('CA NHAN') || n.toUpperCase().includes('CN'));
+      if (cnSheetName) {
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[cnSheetName]);
+        rows.forEach((row, idx) => {
+          const hoten = row["Họ và Tên"] || row["Họ tên"] || row["Ho va ten"] || "";
+          const ten = row["Tên Công trình/ Tạp chí/ Giải thưởng"] || row["Tên công trình"] || row["Ten cong trinh"] || "";
+          if (!hoten && !ten) return;
+
+          const donvi = row["Đơn vị"] || row["Đơn vị công tác"] || "";
+          const loaiTen = row["Loại Tạp chí/Công trình"] || row["Loại hình"] || "";
+          const loaiMa = row["Mã loại"] || "";
+          const loai = findLoaiCode(loaiTen, loaiMa);
+
+          const vaitroTen = row["Vai trò Tác giả"] || row["Vai trò"] || row["Vai tro"] || "";
+          let vaitro = row["Mã vai trò"] || "";
+          if (!vaitro) {
+            const vtLower = vaitroTen.toLowerCase();
+            if (vtLower.includes('đồng chủ biên') || vtLower.includes('dong chu bien')) vaitro = 'DONG_CHU_BIEN';
+            else if (vtLower.includes('chủ nhiệm công trình') || vtLower.includes('độc lập')) vaitro = 'CN_DOC_LAP';
+            else if (vtLower.includes('chủ biên (độc lập)')) vaitro = 'CHỦ_BIEN_1';
+            else if (vtLower.includes('chủ biên')) vaitro = 'CHỦ_BIEN_NHOM';
+            else if (vtLower.includes('thứ nhất & tác giả liên hệ')) vaitro = 'TG_THUNHAT_VA_LIENHE';
+            else if (vtLower.includes('thứ nhất')) vaitro = 'TG_THU_NHAT';
+            else if (vtLower.includes('liên hệ')) vaitro = 'TG_LIEN_HE';
+            else if (vtLower.includes('hiệu đính')) vaitro = 'HIEU_DINH';
+            else if (vtLower.includes('tham gia biên soạn')) vaitro = 'TV_BIEN_SOAN';
+            else vaitro = 'DONG_TAC_GIA';
+          }
+
+          let soChuBien = parseInt(row["Số Chủ biên"]) || 1;
+          if (vaitro === 'DONG_CHU_BIEN' && soChuBien < 2) {
+            const m = vaitroTen.match(/(\d+)\s*chủ biên/i) || vaitroTen.match(/(\d+)\s*CB/i);
+            soChuBien = m ? parseInt(m) : 2;
+          }
+
+          const totalMembers = parseInt(row["Số tác giả"] || row["Tổng số tác giả"] || 1) || 1;
+          const score = parseFloat(row["Điểm công trình quy đổi"] || row["Điểm"] || 0) || 
+            calculateScoreCaNhan(loai, vaitro, totalMembers, 0, 0, soChuBien).score;
+
+          importedCN.push({
+            id: 'CN_IMP_' + Date.now() + '_' + idx,
+            hoten, donvi, ten, loai, loaiTen: SCORE_RULES[loai]?.name || loaiTen,
+            vaitro, vaitroTen: vaitroTen || 'Chủ biên / Tác giả',
+            soChuBien, totalMembers,
+            score: parseFloat(score.toFixed(2))
+          });
+        });
+      }
+
+      if (importedTT.length === 0 && importedCN.length === 0) {
+        alert("Không tìm thấy sheet 'TH TAP THE' hoặc 'TH CA NHAN' hợp lệ trong file Excel.");
+        return;
+      }
+
+      const isAppend = confirmImportMode(importedTT.length, importedCN.length);
+
+      if (isAppend) {
+        tapTheData = tapTheData.concat(importedTT);
+        caNhanData = caNhanData.concat(importedCN);
+      } else {
+        tapTheData = importedTT;
+        caNhanData = importedCN;
+      }
+
+      saveData();
+      renderTapTheTable();
+      renderCaNhanTable();
+      updateFilterOptions();
+      if (!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      alert(`Đã nạp thành công ${importedTT.length} mục Tập thể và ${importedCN.length} mục Cá nhân từ file Excel!`);
+    }
+
+    function updateFilterOptions() {
+      // Cập nhật Filter Tập thể theo loại hình
+      const filterTT = document.getElementById('tt-filter-loai');
+      const valTT = filterTT.value;
+      const loaisTT = [...new Set(tapTheData.map(i => i.loai))];
+      filterTT.innerHTML = '<option value="ALL">-- Tất cả loại hình --</option>' + 
+        loaisTT.map(l => `<option value="${l}">${SCORE_RULES[l]?.name || l}</option>`).join('');
+      filterTT.value = loaisTT.includes(valTT) ? valTT : 'ALL';
+
+      // Cập nhật Filter Cá nhân theo loại hình
+      const filterCN = document.getElementById('cn-filter-loai');
+      const valCN = filterCN.value;
+      const loaisCN = [...new Set(caNhanData.map(i => i.loai))];
+      filterCN.innerHTML = '<option value="ALL">-- Tất cả loại hình --</option>' + 
+        loaisCN.map(l => `<option value="${l}">${SCORE_RULES[l]?.name || l}</option>`).join('');
+      filterCN.value = loaisCN.includes(valCN) ? valCN : 'ALL';
+    }
+
+    function saveData() {
+      localStorage.setItem('neptune_tapthe_2026', JSON.stringify(tapTheData));
+      localStorage.setItem('neptune_canhan_2026', JSON.stringify(caNhanData));
+    }
+
+    function clearAllData() {
+      if (confirm('Xóa toàn bộ dữ liệu hiện có trên hệ thống?')) {
+        cancelEditTapThe();
+        cancelEditCaNhan();
+        tapTheData = []; caNhanData = [];
+        saveData(); renderTapTheTable(); renderCaNhanTable(); updateFilterOptions();
+        if(!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      }
+    }
+
+    function loadSampleData() {
+      tapTheData = [
+        { id: 'TT_01', donvi: 'Khoa Hàng hải', ten: 'Đề tài NCKH Cấp Trường 2025-2026', loai: 'DT_TRUONG', loaiTen: 'Công trình NCKH Cấp Trường', totalAuthors: 1, unitAuthors: 1, score: 0.50, minhchung: 'QĐ 852' },
+        { id: 'TT_02', donvi: 'Khoa Máy tàu biển', ten: 'Journal of Sea Research', loai: 'BB_ISI_Q2', loaiTen: 'Tạp chí thuộc danh mục ISI - Q2', totalAuthors: 3, unitAuthors: 2, score: 2.17, minhchung: 'DOI: 10.1016' }
+      ];
+      caNhanData = [
+        { id: 'CN_01', hoten: 'NGUYỄN VĂN A', donvi: 'Khoa Hàng hải', ten: 'Acta logistica', loai: 'BB_SCOPUS', loaiTen: 'Tạp chí thuộc danh mục Scopus', vaitro: 'TG_THUNHAT_VA_LIENHE', vaitroTen: 'Tác giả Thứ nhất & Tác giả Liên hệ (60%+)', totalMembers: 3, soChuBien: 1, score: 1.47 },
+        { id: 'CN_02', hoten: 'NGUYỄN VĂN A', donvi: 'Khoa Hàng hải', ten: 'Giáo trình Điều động tàu', loai: 'GIAO_TRINH', loaiTen: 'Giáo trình', vaitro: 'DONG_CHU_BIEN', vaitroTen: 'Đồng chủ biên (2 chủ biên / 4 tác giả)', soChuBien: 2, totalMembers: 4, score: 0.80 },
+        { id: 'CN_03', hoten: 'NGUYỄN VĂN A', donvi: 'Khoa Hàng hải', ten: 'Đề tài NCKH cấp Trường', loai: 'DT_TRUONG', loaiTen: 'Công trình NCKH Cấp Trường', vaitro: 'CN_DOC_LAP', vaitroTen: 'Chủ nhiệm công trình (100%)', totalMembers: 1, soChuBien: 1, score: 0.50 }
+      ];
+      saveData(); renderTapTheTable(); renderCaNhanTable(); updateFilterOptions();
+      if(!document.getElementById('tab-dashboard').classList.contains('hidden')) renderDashboard();
+      alert('Đã nạp dữ liệu mẫu thành công!');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      handleTapTheTypeChange();
+      handleCaNhanTypeChange();
+      renderTapTheTable();
+      renderCaNhanTable();
+      updateFilterOptions();
+    });
+  </script>
+</body>
+</html>
+'''
