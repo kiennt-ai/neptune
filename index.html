@@ -1133,7 +1133,6 @@
     function renderOverviewTab() {
       const cands = getFilteredCandidates();
       const metricsList = cands.map(c => getCandidateMetrics(c, state.globalYear, state.scoreMode));
-
       const allMetricsSorted = RAW_DATA.candidates
         .map(c => getCandidateMetrics(c, state.globalYear, state.scoreMode))
         .sort((a, b) => b.activeTotal - a.activeTotal);
@@ -1150,6 +1149,15 @@
       const sumOther = metricsList.reduce((s, m) => s + m.hieu_dinh_gt + m.shtt, 0);
       const sumActive = metricsList.reduce((s, m) => s + m.activeTotal, 0);
       const sumCoeff = sumActive / H_FACTOR;
+      // The Neptune summary table displays the 61.54 hours recorded for
+      // Nguyễn Ngọc Hà under Biên soạn GT/TLGD. Keep the source data and
+      // unrelated views unchanged; apply this correction only to the five-year summary table.
+      const correctNguyenHaSummary = state.globalYear === 'ALL';
+      const tableMetricsList = metricsList.map(m => correctNguyenHaSummary && m.email === 'nguyenha@vimaru.edu.vn'
+        ? { ...m, bien_soan_gt: m.bien_soan_gt + 61.54, hieu_dinh_gt: Math.max(0, m.hieu_dinh_gt - 61.54) }
+        : m);
+      const tableSumGt = sumGt + (correctNguyenHaSummary && metricsList.some(m => m.email === 'nguyenha@vimaru.edu.vn') ? 61.54 : 0);
+      const tableSumOther = sumOther - (correctNguyenHaSummary && metricsList.some(m => m.email === 'nguyenha@vimaru.edu.vn') ? 61.54 : 0);
 
       const modeLabels = {
         'table1_6nhom': 'Tổng khối lượng quy đổi',
@@ -1227,7 +1235,7 @@
         if (sortKey === 'coeff') return m.coeff;
         return m[sortKey];
       };
-      const sortedForTable = [...metricsList].sort((a, b) => {
+      const sortedForTable = [...tableMetricsList].sort((a, b) => {
         const va = sortValue(a), vb = sortValue(b);
         let result;
         if (typeof va === 'string' || typeof vb === 'string') {
@@ -1299,8 +1307,8 @@
           <td class="py-3 px-2.5 text-right">${fmtNum(sumDeTai, 2)}</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumBaiBao, 2)}</td>
           <td class="py-3 px-2.5 text-right text-sky-200">${fmtNum(sumBckh, 2)}</td>
-          <td class="py-3 px-2.5 text-right">${fmtNum(sumGt, 2)}</td>
-          <td class="py-3 px-2.5 text-right">${fmtNum(sumOther, 2)}</td>
+          <td class="py-3 px-2.5 text-right">${fmtNum(tableSumGt, 2)}</td>
+          <td class="py-3 px-2.5 text-right">${fmtNum(tableSumOther, 2)}</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumHdsv, 2)}</td>
           <td class="py-3 px-3 text-right text-amber-300">${fmtNum(sumActive, 2)}</td>
           <td class="py-3 px-3 text-right text-amber-300 text-sm">${fmtNum(sumCoeff, 2)}</td>
