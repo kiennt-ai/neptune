@@ -448,10 +448,11 @@
           <div class="flex items-center gap-2">
             <span class="text-xs text-slate-500">Sắp xếp:</span>
             <select id="rankingSortSelect" class="rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-800">
+              <option value="name_asc">Ứng viên (A → Z)</option>
               <option value="score_desc">Điểm hệ số h = 600 (cao → thấp)</option>
               <option value="score_asc">Điểm hệ số h = 600 (thấp → cao)</option>
-              <option value="tt_asc">Số thứ tự gốc (1 → 7)</option>
-              <option value="works_desc">Tổng số công trình (cao → thấp)</option>
+              <option value="tt_asc">TT gốc (1 → 7)</option>
+              <option value="works_desc">Số công trình (cao → thấp)</option>
             </select>
           </div>
         </div>
@@ -460,18 +461,19 @@
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-semibold tracking-wider text-[11px]">
-                <th class="py-3 px-3 text-center">Hạng</th>
-                <th class="py-3 px-3 text-center">Ứng viên / email / đơn vị</th>
-                <th class="py-3 px-2.5 text-center">Đề tài các cấp<br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
-                <th class="py-3 px-2.5 text-center">Bài báo tạp chí<br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
-                <th class="py-3 px-2.5 text-center">Biên soạn GT/TLGD<br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
-                <th class="py-3 px-2.5 text-center">Hiệu đính và SHTT<br><span class="text-[10px] font-normal text-slate-500">(Giờ)</span></th>
-                <th class="py-3 px-2.5 text-center">HD SV NCKH<br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
-                <th class="py-3 px-2.5 text-center bg-sky-50/70 text-sky-900">Báo cáo HN/HT<br><span class="text-[10px] font-normal text-sky-700">(sheet năm học)</span></th>
-                <th class="py-3 px-3 text-center bg-amber-50/80 text-amber-950 font-bold">Tổng khối lượng quy đổi<br><span class="text-[10px] font-normal text-amber-800" id="thTotalModeSub">(giờ chuẩn NCKH)</span></th>
-                <th class="py-3 px-3 text-center bg-amber-100/80 text-amber-950 font-bold">Hệ số quy đổi (÷ 600)<br><span class="text-[10px] font-normal text-amber-800">Điểm xét giải</span></th>
-                <th class="py-3 px-2.5 text-center">Số công trình<br><span class="text-[10px] font-normal text-slate-500">(file chi tiết)</span></th>
-                <th class="py-3 px-3 text-center">Thao tác</th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="tt" class="hover:text-vmu-700">TT</button></th>
+                <th class="py-3 px-3 text-center"><button type="button" data-ranking-sort="name" class="hover:text-vmu-700">Ứng viên / email / đơn vị</button></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="de_tai" class="hover:text-vmu-700">Đề tài các cấp</button><br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="bai_bao" class="hover:text-vmu-700">Bài báo Khoa học</button><br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
+                <th class="py-3 px-2.5 text-center bg-sky-50/70 text-sky-900"><button type="button" data-ranking-sort="bao_cao_hnht" class="hover:text-sky-700">Báo cáo HN/HT</button><br><span class="text-[10px] font-normal text-sky-700">(sheet năm học)</span></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="bien_soan_gt" class="hover:text-vmu-700">Biên soạn GT/TLGD</button><br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="other" class="hover:text-vmu-700">Hiệu đính và SHTT</button><br><span class="text-[10px] font-normal text-slate-500">(Giờ)</span></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="hd_sv" class="hover:text-vmu-700">HD SV NCKH</button><br><span class="text-[10px] font-normal text-slate-500">(giờ)</span></th>
+                <th class="py-3 px-3 text-center bg-amber-50/80 text-amber-950 font-bold"><button type="button" data-ranking-sort="score" class="hover:text-amber-700">Tổng khối lượng quy đổi</button><br><span class="text-[10px] font-normal text-amber-800" id="thTotalModeSub">(giờ chuẩn NCKH)</span></th>
+                <th class="py-3 px-3 text-center bg-amber-100/80 text-amber-950 font-bold"><button type="button" data-ranking-sort="coeff" class="hover:text-amber-700">Hệ số quy đổi (÷ 600)</button><br><span class="text-[10px] font-normal text-amber-800">Điểm xét giải</span></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="works" class="hover:text-vmu-700">Số Công trình</button><br><span class="text-[10px] font-normal text-slate-500">(file chi tiết)</span></th>
+                <th class="py-3 px-2.5 text-center"><button type="button" data-ranking-sort="rank" class="hover:text-vmu-700">Hạng (dự kiến)</button></th>
+                <th class="py-3 px-3 text-center">Thao Tác</th>
               </tr>
             </thead>
             <tbody id="rankingTableBody" class="divide-y divide-slate-200 text-slate-800">
@@ -963,7 +965,7 @@
       globalYear: 'ALL',
       scoreMode: 'table1_6nhom',
       trendMode: 'candidate',
-      rankingSort: 'score_desc',
+      rankingSort: 'name_asc',
       matrixYear: 'ALL',
       matrixCand: 'ALL',
       workCand: 'ALL',
@@ -1214,11 +1216,26 @@
         `;
       }).join('');
 
+      const sortKey = String(state.rankingSort || 'name_asc').replace(/_(?:asc|desc)$/, '');
+      const sortDir = String(state.rankingSort || 'name_asc').endsWith('_desc') ? -1 : 1;
+      const sortValue = (m) => {
+        if (sortKey === 'name') return String(m.name || '').replace(/^Ứng viên\s+/i, '');
+        if (sortKey === 'other') return m.hieu_dinh_gt + m.shtt;
+        if (sortKey === 'works') return m.work_counts.total_works;
+        if (sortKey === 'rank') return rankMap[m.email];
+        if (sortKey === 'score') return m.activeTotal;
+        if (sortKey === 'coeff') return m.coeff;
+        return m[sortKey];
+      };
       const sortedForTable = [...metricsList].sort((a, b) => {
-        if (state.rankingSort === 'score_desc') return b.activeTotal - a.activeTotal;
-        if (state.rankingSort === 'score_asc') return a.activeTotal - b.activeTotal;
-        if (state.rankingSort === 'works_desc') return b.work_counts.total_works - a.work_counts.total_works;
-        return a.tt - b.tt;
+        const va = sortValue(a), vb = sortValue(b);
+        let result;
+        if (typeof va === 'string' || typeof vb === 'string') {
+          result = String(va ?? '').localeCompare(String(vb ?? ''), 'vi', { sensitivity: 'base' });
+        } else {
+          result = (Number(va) || 0) - (Number(vb) || 0);
+        }
+        return result === 0 ? a.tt - b.tt : result * sortDir;
       });
 
       const tbody = document.getElementById('rankingTableBody');
@@ -1234,19 +1251,19 @@
 
         return `
           <tr class="hover:bg-sky-50/50 transition">
-            <td class="py-3 px-3 text-center">${rkBadge}</td>
+            <td class="py-3 px-2.5 text-center font-semibold">${m.tt}</td>
             <td class="py-3 px-3">
               <button type="button" onclick="openCandidateProfile('${m.email}')" class="font-bold text-slate-900 hover:text-vmu-600 text-left">
-                ${m.tt}. ${m.name}
+                ${m.name}
               </button>
               <div class="text-[11px] text-slate-500">${m.email} • <span class="font-medium text-slate-700">${m.unit}</span></div>
             </td>
             <td class="py-3 px-2.5 text-right font-medium">${fmtNum(m.de_tai, 2)}</td>
             <td class="py-3 px-2.5 text-right font-medium">${fmtNum(m.bai_bao, 2)}</td>
+            <td class="py-3 px-2.5 text-right bg-sky-50/40 font-medium text-sky-900">${fmtNum(m.bao_cao_hnht, 2)}</td>
             <td class="py-3 px-2.5 text-right font-medium">${fmtNum(m.bien_soan_gt, 2)}</td>
             <td class="py-3 px-2.5 text-right ${(m.hieu_dinh_gt + m.shtt) > 0 ? 'font-medium text-slate-800' : 'text-slate-400'}">${fmtNum(m.hieu_dinh_gt + m.shtt, 2)}</td>
             <td class="py-3 px-2.5 text-right font-medium">${fmtNum(m.hd_sv, 2)}</td>
-            <td class="py-3 px-2.5 text-right bg-sky-50/40 font-medium text-sky-900">${fmtNum(m.bao_cao_hnht, 2)}</td>
             <td class="py-3 px-3 text-right bg-amber-50/50 font-bold text-slate-900">${fmtNum(m.activeTotal, 2)}</td>
             <td class="py-3 px-3 text-right bg-amber-100/50 font-extrabold text-vmu-800 text-sm">
               ${fmtNum(m.coeff, 2)}
@@ -1257,6 +1274,7 @@
                 ${m.work_counts.total_works} công trình
               </span>
             </td>
+            <td class="py-3 px-2.5 text-center">${rkBadge}</td>
             <td class="py-3 px-3 text-center">
               <div class="inline-flex items-center gap-1">
                 <button type="button" onclick="openCandidateProfile('${m.email}')"
@@ -1280,13 +1298,14 @@
           <td class="py-3 px-3 text-center" colspan="2">Tổng cộng (${metricsList.length} ứng viên)</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumDeTai, 2)}</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumBaiBao, 2)}</td>
+          <td class="py-3 px-2.5 text-right text-sky-200">${fmtNum(sumBckh, 2)}</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumGt, 2)}</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumOther, 2)}</td>
           <td class="py-3 px-2.5 text-right">${fmtNum(sumHdsv, 2)}</td>
-          <td class="py-3 px-2.5 text-right text-sky-200">${fmtNum(sumBckh, 2)}</td>
           <td class="py-3 px-3 text-right text-amber-300">${fmtNum(sumActive, 2)}</td>
           <td class="py-3 px-3 text-right text-amber-300 text-sm">${fmtNum(sumCoeff, 2)}</td>
           <td class="py-3 px-2.5 text-center">${totalWorksSum} lượt</td>
+          <td class="py-3 px-2.5"></td>
           <td class="py-3 px-3"></td>
         </tr>
       `;
@@ -2670,6 +2689,18 @@
       document.getElementById('rankingSortSelect').addEventListener('change', (e) => {
         state.rankingSort = e.target.value;
         renderOverviewTab();
+      });
+      document.querySelectorAll('[data-ranking-sort]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.rankingSort;
+          const current = String(state.rankingSort || 'name_asc');
+          const currentKey = current.replace(/_(?:asc|desc)$/, '');
+          const nextDir = currentKey === key && current.endsWith('_asc') ? 'desc' : 'asc';
+          state.rankingSort = key + '_' + nextDir;
+          const select = document.getElementById('rankingSortSelect');
+          if ([...select.options].some((option) => option.value === state.rankingSort)) select.value = state.rankingSort;
+          renderOverviewTab();
+        });
       });
 
       document.getElementById('matrixYearSelect').addEventListener('change', (e) => {
