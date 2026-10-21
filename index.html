@@ -371,7 +371,7 @@
             </ul>
           </div>
           <div class="mt-3 pt-2.5 border-t border-slate-700 flex items-center justify-between text-[11px] text-slate-300">
-            <span>Đối chiếu theo hai tệp dữ liệu Excel được cung cấp</span>
+            <span>Đối chiếu theo dữ liệu hiển thị trên Hệ thống</span>
             <span class="text-amber-300 font-semibold">Quản lý Khoa học và Công nghệ</span>
           </div>
         </div>
@@ -382,7 +382,7 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5">
           <div class="flex items-center justify-between mb-3">
             <div>
-              <h3 class="text-sm sm:text-base font-bold text-slate-900">Biểu đồ xếp hạng hệ số quy đổi giải thưởng (điểm = tổng giờ ÷ 600)</h3>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900">Biểu đồ xếp hạng hệ số quy đổi được chuẩn hóa (điểm = tổng giờ ÷ 600)</h3>
               <p class="text-xs text-slate-500">So sánh Hệ số quy đổi (Tổng khối lượng quy đổi ÷ 600) giữa các ứng viên</p>
             </div>
           </div>
@@ -442,7 +442,7 @@
               <span>Bảng tổng hợp điểm quy đổi và hệ số đánh giá giải thưởng Neptune (h = 600)</span>
             </h2>
             <p class="text-xs text-slate-500 mt-0.5">
-              Dữ liệu điểm 05 năm lấy trực tiếp từ <strong>sheet TONG HOP 05 (cột D–L, dòng 6–12)</strong> của Excel gốc. Tổng giờ = tổng 7 nhóm hoạt động; hệ số = tổng giờ / 600. Lọc theo năm học sẽ chuyển sang dữ liệu năm tương ứng. Nhấn tên ứng viên để xem hồ sơ.
+              Dữ liệu điểm 05 năm lấy trực tiếp từ <strong>Hệ thống Quản lý Khoa học và Công nghệ</strong> của Excel gốc. Tổng giờ = tổng 7 nhóm hoạt động; hệ số = tổng giờ / 600. Lọc theo năm học sẽ chuyển sang dữ liệu năm tương ứng. Nhấn tên ứng viên để xem hồ sơ.
             </p>
           </div>
           <div class="flex items-center gap-2">
@@ -457,7 +457,7 @@
           </div>
         </div>
 
-        <div class="mx-4 mt-2 mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950" id="rankingSourceAuditNote"><strong>Cơ sở xếp hạng:</strong> Sheet <strong>TONG HOP 05</strong> trong TONG HOP NEPTUNE 2026 (1).xlsx; hệ số = tổng điểm gốc / 600. <strong>Lưu ý đối soát:</strong> dữ liệu tổng các sheet năm học chưa trùng bảng tổng hợp 05 năm đối với 4 ứng viên (chênh lệch năm học trừ tổng hợp 05 năm: Phạm Thị Yến: -4.433,31 giờ; Đào Văn Thi: +644,44 giờ; Đoàn Hữu Khánh: +2.708,87 giờ; Vũ Văn Tuyển: +1.080,00 giờ). Đây là chênh lệch trong Excel nguồn, dashboard không tự ý cộng chồng hoặc sửa điểm gốc.</div>
+        <div class="mx-4 mt-2 mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950" id="rankingSourceAuditNote"><strong>Cơ sở xếp hạng: <strong> hệ số = tổng điểm gốc / 600 </strong>.</div>
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
@@ -541,7 +541,7 @@
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5">
           <div class="flex items-center justify-between mb-3">
             <div>
-              <h3 class="text-sm sm:text-base font-bold text-slate-900">Nhiệm vụ NCKH (cấp QG/Bộ và cấp Trường) và giáo trình / sách</h3>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900">Nhiệm vụ NCKH (cấp QG/Bộ và cấp Trường) và giáo trình / TLGD</h3>
               <p class="text-xs text-slate-500">So sánh số lượng đề tài cấp Nhà nước/Bộ, cấp Trường (Chủ nhiệm/Tham gia) & Giáo trình / TLGD</p>
             </div>
           </div>
@@ -572,7 +572,7 @@
               <span>Bảng dữ liệu chi tiết khối lượng NCKH 05 năm học (2021–2022 đến 2025–2026)</span>
             </h2>
             <p class="text-xs text-slate-500 mt-0.5">
-              Dữ liệu tổng hợp từ Hệ thống phần "Báo cáo nhà khoa học" (<code class="bg-slate-100 px-1 rounded">2021-2022</code> đến <code class="bg-slate-100 px-1 rounded">2025-2026</code>), tổng hợp giá trị cột Tổng khối lượng quy đổi.
+              Dữ liệu Tổng hợp giá trị cột Tổng khối lượng quy đổi.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
@@ -2941,11 +2941,11 @@
     <section id="ctab-overview" class="collective-tab-panel space-y-5">
       <div id="collectiveKpis" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"></div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="collective-card p-4 sm:p-5"><h3 class="text-sm sm:text-base font-bold text-slate-900">Xếp hạng Điểm trung bình xét giải</h3><p class="text-xs text-slate-500 mt-1">Điểm = (Tiêu chí 1 + Tiêu chí 2) ÷ 2</p><div class="relative h-80 mt-3"><canvas id="chartCollectiveRanking"></canvas></div></div>
+        <div class="collective-card p-4 sm:p-5"><h3 class="text-sm sm:text-base font-bold text-slate-900">Xếp hạng Điểm trung bình các tiêu chí đề xuất để phục vụ xét giải</h3><p class="text-xs text-slate-500 mt-1">Điểm = (Tiêu chí 1 + Tiêu chí 2) ÷ 2</p><div class="relative h-80 mt-3"><canvas id="chartCollectiveRanking"></canvas></div></div>
         <div class="collective-card p-4 sm:p-5"><h3 class="text-sm sm:text-base font-bold text-slate-900">So sánh Tiêu chí 1 và Tiêu chí 2</h3><p class="text-xs text-slate-500 mt-1">Chuẩn hóa theo số CBGV để so sánh giữa các đơn vị.</p><div class="relative h-80 mt-3"><canvas id="chartCollectiveCriteria"></canvas></div></div>
       </div>
       <div class="collective-card overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-base font-bold text-slate-900"><i class="fa-solid fa-table-list text-vmu-600 mr-2"></i>Bảng tổng hợp số liệu tính toán theo các Tiêu chí đề xuất</h2><p class="text-xs text-slate-500 mt-1">Số CBGV và tổng giờ lấy trực tiếp từ Hệ thống Quản lý khao học và Công nghệ; số công trình được tổng hợp trên hệ thống và đối soát tác giả với danh sách 614 CBGV. Nhấn tiêu đề cột để sắp xếp tăng/giảm.</p></div><span class="text-[11px] text-slate-500"><i class="fa-solid fa-arrow-up-wide-short mr-1"></i>Sắp xếp trực tiếp theo tiêu đề cột</span></div>
+        <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-base font-bold text-slate-900"><i class="fa-solid fa-table-list text-vmu-600 mr-2"></i>Bảng tổng hợp số liệu tính toán theo các Tiêu chí đề xuất</h2><p class="text-xs text-slate-500 mt-1">Số CBGV và tổng giờ lấy trực tiếp từ Hệ thống Quản lý khao học và Công nghệ; số công trình được tổng hợp trên hệ thống và đối soát tác giả với danh sách 614 CBGV (Nhấp tiêu đề cột để sắp xếp tăng/giảm).</p></div><span class="text-[11px] text-slate-500"><i class="fa-solid fa-arrow-up-wide-short mr-1"></i>Sắp xếp trực tiếp theo tiêu đề cột</span></div>
         <div class="overflow-x-auto custom-scrollbar"><table class="w-full text-xs collective-table"><thead><tr>
           <th class="p-2"><button class="collective-sort-btn" data-rsort="tt">TT <span class="collective-sort-indicator" data-rind="tt">↕</span></button></th>
           <th class="p-2"><button class="collective-sort-btn" data-rsort="unit">Đơn vị <span class="collective-sort-indicator" data-rind="unit">↕</span></button></th>
@@ -2964,8 +2964,8 @@
 
     <section id="ctab-activities" class="collective-tab-panel hidden space-y-5">
       <div class="collective-card p-4 sm:p-5"><div class="flex flex-wrap items-end gap-3"><div><label class="block text-[11px] font-semibold text-slate-500 mb-1">Đơn vị</label><select id="activityUnitFilter" class="rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-xs"><option value="ALL">Tất cả 15 đơn vị</option></select></div><div class="text-xs text-slate-500">Dữ liệu biểu đồ được tính trực tiếp từ dữ liệu gốc thông tin các công trình sau đối soát CBGV.</div></div></div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5"><div class="collective-card p-4 sm:p-5"><h3 class="font-bold text-sm">Cơ cấú theo nhóm hoạt động KHCN của đơn vị</h3><div class="relative h-96 mt-3"><canvas id="chartCollectiveActivities"></canvas></div></div><div class="collective-card p-4 sm:p-5"><h3 class="font-bold text-sm">Năng suất công trình và giờ NCKH/CBGV</h3><div class="relative h-96 mt-3"><canvas id="chartCollectiveProductivity"></canvas></div></div></div>
-      <div class="collective-card overflow-hidden"><div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2"><h3 class="font-bold text-sm">Ma trận số lượng công trình theo chi tiết các hoạt động KHCN</h3><span class="text-[11px] text-slate-500">Nhấn tiêu đề cột để sắp xếp tăng/giảm</span></div><div class="overflow-x-auto custom-scrollbar"><table class="w-full text-xs collective-table"><thead><tr>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5"><div class="collective-card p-4 sm:p-5"><h3 class="font-bold text-sm">Cơ cấu theo nhóm hoạt động khoa học công nghệ của đơn vị</h3><div class="relative h-96 mt-3"><canvas id="chartCollectiveActivities"></canvas></div></div><div class="collective-card p-4 sm:p-5"><h3 class="font-bold text-sm">Năng suất công trình và giờ NCKH/CBGV</h3><div class="relative h-96 mt-3"><canvas id="chartCollectiveProductivity"></canvas></div></div></div>
+      <div class="collective-card overflow-hidden"><div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2"><h3 class="font-bold text-sm">Ma trận số lượng công trình theo chi tiết các hoạt động khoa học công nghệ chính</h3><span class="text-[11px] text-slate-500">Nhấp vào tiêu đề cột để sắp xếp tăng/giảm</span></div><div class="overflow-x-auto custom-scrollbar"><table class="w-full text-xs collective-table"><thead><tr>
         <th class="p-2"><button class="collective-sort-btn" data-asort="unit">Khoa/Viện <span class="collective-sort-indicator" data-aind="unit">↕</span></button></th>
         <th class="p-2"><button class="collective-sort-btn" data-asort="NN-BO-TP">Đề tài NN/Bộ/TP <span class="collective-sort-indicator" data-aind="NN-BO-TP">↕</span></button></th>
         <th class="p-2"><button class="collective-sort-btn" data-asort="TRONG DIEM">Trọng điểm <span class="collective-sort-indicator" data-aind="TRONG DIEM">↕</span></button></th>
